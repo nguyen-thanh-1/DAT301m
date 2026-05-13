@@ -1,0 +1,48 @@
+1. TỔNG QUAN VỀ BÀI TẬP
+Neural Style Transfer là một kỹ thuật tối ưu hóa cho phép kết hợp cấu trúc của một bức ảnh Nội dung (Content) với phong cách nghệ thuật của một bức ảnh Tham chiếu (Style). Mục tiêu của bài tập là xây dựng một hệ thống Deep Learning có khả năng tạo ra một tác phẩm nghệ thuật mới từ hai hình ảnh đầu vào.
+
+2. CÁC BƯỚC THỰC HIỆN CHI TIẾT
+Bước 1: Tiền xử lý hình ảnh (Image Preprocessing)
+Đây là bước chuẩn bị dữ liệu thô để mạng thần kinh có thể hiểu được.
+Resize: Đưa ảnh về kích thước phù hợp (ví dụ: 224 x 224) để cân bằng giữa chất lượng và tốc độ xử lý.
+Zero-centering: Trừ đi giá trị màu trung bình (Mean) của tập ImageNet để dữ liệu tập trung quanh điểm 0.
+Hệ màu: Chuyển đổi từ RGB sang BGR theo đúng chuẩn mà mạng VGG19 đã được huấn luyện.
+Bước 2: Trích xuất đặc trưng với VGG19
+Chúng ta sử dụng mô hình VGG19 đã huấn luyện sẵn trên tập ImageNet.
+Mô hình: Tải mạng VGG19 và loại bỏ các lớp phân loại ở trên cùng (include_top=False).
+Content Layer: Thường sử dụng lớp block5_conv2 để lấy thông tin cấu trúc vật thể ở cấp độ cao.
+Style Layers: Sử dụng danh sách các lớp từ block1_conv1 đến block5_conv1 để thu thập các đặc trưng từ nét vẽ nhỏ đến mảng màu lớn.
+Bước 3: Định nghĩa các hàm mất mát (Loss Functions)
+Mô hình sẽ tìm cách cực tiểu hóa tổng sai số thông qua 3 thành phần chính:
+Content Loss: Đo lường sự khác biệt về cấu trúc vật thể giữa ảnh gốc và ảnh đang vẽ.
+Style Loss (Gram Matrix): Sử dụng ma trận Gram để đo lường sự tương quan giữa các kênh đặc trưng, từ đó tái hiện phong cách nghệ thuật.
+Total Variation Loss: Đóng vai trò làm mịn ảnh, giảm thiểu các nhiễu hạt (pixel li ti) không mong muốn.
+Bước 4: Vòng lặp tối ưu hóa (Training Loop)
+Cơ chế: Sử dụng tf.GradientTape để ghi lại các phép toán và tự động tính đạo hàm (Automatic Differentiation).
+Cập nhật: Khác với các bài toán thông thường, ở đây chúng ta cập nhật trực tiếp giá trị của từng điểm ảnh (combination_image).
+Optimizer: Sử dụng thuật toán Adam hoặc SGD với lịch trình giảm tốc độ học (Exponential Decay) để đạt được kết quả ổn định.
+
+3. CÁC THAM SỐ CẤU HÌNH GỢI Ý
+Để đạt được kết quả thẩm mỹ tốt nhất, các em nên bắt đầu với các thông số sau:
+Tham số
+Giá trị gợi ý
+Mục đích
+content_weight
+2.5 x 10^-8
+Duy trì độ nhận diện của vật thể gốc
+style_weight
+1.0 x 10^-6
+Tăng cường độ đậm nét của phong cách nghệ thuật
+total_variation_weight
+1.0 x 10^-6
+Giúp bức ảnh trông mịn màng và tự nhiên hơn
+iterations
+100-700
+Số vòng lặp tối ưu hóa (càng cao ảnh càng chi tiết)
+
+4. YÊU CẦU ĐỐI VỚI BÁO CÁO (REPORT)
+Sinh viên cần trình bày rõ các nội dung sau trong file báo cáo:
+Giải thích lựa chọn: Tại sao các chọn các lớp (layers) cụ thể trong mạng VGG19 để tính toán Style Loss?
+So sánh kết quả: Hiển thị ảnh kết quả sau các mốc 100, 300, 500, và 700 vòng lặp để thấy sự tiến triển.
+Thử nghiệm trọng số: Thử thay đổi style_weight và nhận xét về sự thay đổi của tác phẩm nghệ thuật thu được.
+Phân tích kĩ thuật: Nêu vai trò của tf.GradientTape trong việc cập nhật điểm ảnh.
