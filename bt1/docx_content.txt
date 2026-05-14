@@ -46,3 +46,28 @@ Giải thích lựa chọn: Tại sao các chọn các lớp (layers) cụ thể
 So sánh kết quả: Hiển thị ảnh kết quả sau các mốc 100, 300, 500, và 700 vòng lặp để thấy sự tiến triển.
 Thử nghiệm trọng số: Thử thay đổi style_weight và nhận xét về sự thay đổi của tác phẩm nghệ thuật thu được.
 Phân tích kĩ thuật: Nêu vai trò của tf.GradientTape trong việc cập nhật điểm ảnh.
+
+câu 1: Giải thích lựa chọn: Tại sao các chọn các lớp (layers) cụ thể trong mạng VGG19 để tính toán Style Loss?
+trl: 
+- Việc lựa chọn các lớp cụ thể trong mạng VGG19 dựa trên khả năng trích xuất đặc trưng phân cấp của mạng thần kinh nhân tạo CNN. Các lớp nông ở phía đầu mạng (như block1_conv1, block2_conv1) đóng vai trò nhận diện các chi tiết vi mô như nét cọ đơn lẻ, kết cấu bề mặt và các điểm màu sắc nhỏ. Trong khi đó, các lớp sâu hơn ở phía cuối mạng (như block4_conv1, block5_conv1) lại tập trung vào các đặc trưng trừu tượng cấp cao như hoa văn lặp lại, mảng miếng bố cục và cấu trúc hình khối tổng thể của phong cách nghệ thuật.
+- Phong cách nghệ thuật không nằm ở một vị trí cố định mà là sự xuất hiện đồng thời của các đặc trưng màu sắc và nét vẽ trên toàn bộ bức tranh. Tại mỗi lớp được chọn, chúng ta không so sánh trực tiếp vị trí các điểm ảnh (vì như vậy sẽ thành so sánh nội dung), mà sử dụng ma trận Gram để tính toán sự tương quan giữa các kênh đặc trưng. Việc này giúp loại bỏ hoàn toàn thông tin về không gian (vật thể nằm ở đâu) và chỉ giữ lại "essence" của phong cách (màu này thường đi với nét vẽ nào), biến các bản đồ đặc trưng thành một bản tóm tắt thống kê về kết cấu bề mặt.
+
+câu 2: So sánh kết quả: Hiển thị ảnh kết quả sau các mốc 1100, 3100, 6000, 900 vòng lặp để thấy sự tiến triển.
+trl:
+- Về kết quả với chỉ số style_weight = 1e-6: 
+  - loss cuối ~ 19.35
+  - phong cách (style) mạnh và chiếm ưu thế
+  - nội dung (content) khó nhận diện về sau do bị style xâm chiếm nhiều hơn
+- đánh giá: ảnh thiên về nghệ thuật hơn
+
+câu 3: Thử nghiệm trọng số: Thử thay đổi style_weight và nhận xét về sự thay đổi của tác phẩm nghệ thuật thu được.
+trl: 
+- khi thay đổi style_weight = 1e-7:
+  - loss cuối ~ 10.99: thấp hơn so với style_weight = 1e-6 (19.35)
+  - phong cách (style): hài hòa hơn, có sự cân bằng giữa content và style
+  - nội dung (content): vẫn giữ được độ nhận diện của vật thể gốc, vó thể nhận diện vật thể gốc rõ ràng hơn
+- đánh giá: cân bằng và tự nhiên hơn
+
+câu 4: Phân tích kĩ thuật: Nêu vai trò của tf.GradientTape trong việc cập nhật điểm ảnh.
+trl: 
+Vai trò của tf.GradientTape: Trong Neural Style Transfer, mạng VGG19 được giữ cố định. Thay vì cập nhật trọng số mạng, ta cập nhật trực tiếp các pixel của bức ảnh. tf.GradientTape ghi lại forward pass để tính loss, sau đó tự động tính đạo hàm (gradient) của loss theo từng pixel. Optimizer Adam dùng gradient này để cập nhật pixel, giúp bức ảnh dần mang phong cách nghệ thuật mong muốn.

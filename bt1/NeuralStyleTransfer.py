@@ -202,8 +202,8 @@ def download_sample_images():
 if __name__ == '__main__':
     # Bạn có thể thay đổi đường dẫn tới ảnh của riêng mình ở đây
     # Ví dụ:
-    # my_content = 'path_to_my_content.jpg'
-    # my_style = 'path_to_my_style.jpg'
+    my_content = 'path_to_my_content.jpg'
+    my_style = 'path_to_my_style.jpg'
     
     # Ở đây tôi dùng ảnh mẫu tự tải về nếu không tìm thấy ảnh
     print("Chuẩn bị dữ liệu...")
